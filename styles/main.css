@@ -64,7 +64,7 @@ float: right;
 
 .score {
 	margin: 0;
-	font-size: 122px;
+	font-size: 110px;
 	color: white;
 	display: inline-block;
 }
@@ -81,4 +81,13 @@ float: right;
 
 .driving-badges .col, .driving-badges .row {
 	padding-left: 0;
+}
+
+body .att-loader {
+	display: none !important;
+}
+/*
+.att-alert {
+	min-height: 125px !important;
+	padding-bottom: 40px !important;*/
 }

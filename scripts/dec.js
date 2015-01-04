@@ -6,25 +6,30 @@
 
 function decSetSubscriptions() {
     //*** TODO: Set here subscription to all namespaces you are interested in
-    drive.vehicleinfo.subscribe(decCallback, logError);
+    // drive.vehicleinfo.subscribe(decCallback, logError);
+    
+    /*
     drive.navigation.subscribe(decCallback, logError);
+    
     drive.notification.subscribe(decCallback, logError);
     drive.identity.users.subscribe(decCallback, logError);
     drive.commerce.subscribe(decCallback, logError);
     drive.settings.subscribe(decCallback, logError);
+    */
 }
 
 function decCallback(decResponse) {
     console.info("sample-app: Calling back Dec with response: " + JSON.stringify(decResponse));
-    process(decResponse);
+    console.info("sample-app: Calling back Dec with response: ", decResponse);
+    //TODO process(decResponse);
 }
 
 function process(data) {
 
-    if(data.position || data.diagnostic || data.climateControl || data.lightStatus || data.vehicleSpeed) {
+    if(data.position /* || data.diagnostic */ || data.climateControl || data.lightStatus || data.vehicleSpeed) {
         console.log('###'+JSON.stringify(data));
-        if(data.position) { $rootScope.postData.payload.position = data.position; }
-        if(data.diagnostic) { $rootScope.postData.payload.diagnostic = data.diagnostic; }
+        if(data.position) { $rootScope.postData.payload.navigation = data.position; }
+        // if(data.diagnostic) { $rootScope.postData.payload.diagnostic = data.diagnostic; }
         if(data.climateControl) { $rootScope.postData.payload.climateControl = data.climateControl; }
         if(data.lightStatus) { $rootScope.postData.payload.lightStatus = data.lightStatus; }
         if(data.vehicleSpeed) { $rootScope.postData.payload.vehicleSpeed = data.vehicleSpeed; }

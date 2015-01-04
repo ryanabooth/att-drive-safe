@@ -3,48 +3,1176 @@
 // var angular, console, $rootScope;
 
 angular.module('app')
-    .controller('SecondPageCtrl', ["$scope", "$http", '$interval', function ($scope, $http, $interval) {
+    .controller('SecondPageCtrl', ["$scope", "$http", '$interval', '$alert', function ($scope, $http, $interval, $alert) {
         $rootScope.$watch('decInstance.isOnline', function(value){
             $scope.isDecOnline = value;
         });
 
-        function logSuccessfulPost (response) {
-            console.error('API post');
-            console.error(JSON.stringify(response));
-        }
-
-        function logError (response) {
-            console.error('Just Drive API post error');
-        }
-
         // {'currentScore': last_score, 'avgScore': avg_score}
-        $scope.score = 75;
+        $scope.score = '--';
+
+        var statuses = [
+            'green',
+            'yellow',
+            'orange',
+            'red'
+        ];
 
         $scope.status = {
-            smooth: 'green',
-            messaging: 'green',
-            speed: 'green',
-            weather: 'green'
+            smooth: statuses[0],
+            messaging: statuses[0],
+            speed: statuses[0],
+            weather: statuses[0]
         };
 
         $scope.pickups = [
-          { text: 'Michael Bay', desc: '123 Fake Street', href: '', selected: false },
-          { text: 'John Wayne', desc: '123 Fake Street', href: '', selected: false }
+          // { text: 'Michael Bay', desc: '125 Hollywood Cresent', href: '', selected: false },
+          // { text: 'John Wayne', desc: '2234 Lakewood Drive', href: '', selected: false }
         ];
+
+        function logSuccessfulPost (response) {
+            console.log('### API post');
+            console.log(JSON.stringify(response));
+        }
+
+        function logError (response) {
+            console.error('### Just Drive API post error');
+        }
+
+        function setScore (response) {
+            $scope.score = Math.abs(parseInt(response.data.score.currentScore, 10));
+        }
+
+        function newDestination(response) {
+            console.log('#### response', response);
+            $alert.show({
+                type: 'success',
+                showConfirmationBtn: true,
+                buttonText: 'OK',
+                autoCloseInterval: 3000,
+                title: 'Route Set',
+                text: 'New destination set'
+            });
+            // drive.navigation.routes.waypoints.set(response.data.payload.path)
+            // .then(function () {
+                
+            // });
+        }
+
+        function acceptPickup () {
+            var data = {
+                user: $scope.pickups[0].text,
+                address: $scope.pickups[0].desc,
+                lat: -115.195564,
+                lon: 36.114094
+            };
+            $http.post('http://' + $rootScope.serverIP + 'api/approve_pickup', {"payload": data})
+                .then(newDestination, logError);
+        }
+
+        function listOfPickups (response) {
+            $scope.pickups = [];
+            for (var i = response.data.payload.length - 1; i >= 0; i--) {
+                $scope.pickups.push({text: response.data.payload[i].user, desc: response.data.payload[i].address});
+            }
+            // delete this if needed
+            // 
+            if( $scope.pickups.length > 0 ) {
+                var message = $scope.pickups[0].text + ' is at ' + $scope.pickups[0].desc;
+                message = message.substr(0, 40) + '...',
+                $alert.show({
+                    type: 'info',
+                    showConfirmationBtn: true,
+                    buttonText: 'Accept',
+                    onClose: acceptPickup(),
+                    title: 'Ride Request',
+                    text: message
+                });
+            }
+        }
+
+
+        var fakeStep = 0;
+        var previousSpeed;
+        var smooth = 0;
+
+        var fakeData = [
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '50'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.050,
+                        "heading": 26.5,
+                        "longitude": 24.333,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '60'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.100,
+                        "heading": 26.5,
+                        "longitude": 24.383,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '35'
+                },
+                "lightStatus": {
+                    "rightTurn": "true",
+                    "parking": "false",
+                    "break": "true",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '100'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "true",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '70'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '100'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "true",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '100'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "true",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '55'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '58'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '60'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '60'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '64'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '70'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '75'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '28'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '28'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+            {
+                'navigation': {
+                    'position': {
+                        "latitude": 10.000,
+                        "heading": 26.5,
+                        "longitude": 24.283,
+                        "altitude": 1029,
+                        "velocity": 30,
+                        "precision": 2,
+                    }
+                },
+                'vehicleSpeed': {
+                    'speed': '28'
+                },
+                "lightStatus": {
+                    "rightTurn": "false",
+                    "parking": "false",
+                    "break": "false",
+                    "fog": "false",
+                    "highBeam": "false",
+                    "hazard": "false",
+                    "_break": "false",
+                    "leftTurn": "false",
+                    "head": "false"
+                },
+                "climateControl": {
+                    "zones": [{
+                                  "zone": "front",
+                                  "airflowDirection": "defrostfloor"
+                              }, {
+                                  "fanSpeedLevel": "0",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "airConditioning": "false"
+                              }, {
+                                  "airRecirculation": "false",
+                                  "zone": "front"
+                              }, {
+                                  "heater": "false",
+                                  "zone": "front"
+                              }, {
+                                  "zone": "front",
+                                  "seatHeater": "0"
+                              }, {
+                                  "seatCooler": "0",
+                                  "zone": "front"
+                              }],
+                    "steeringWheelHeater": "0",
+                    "temperature": {
+                        "interiorTemperature": "0"
+                    }
+                }
+            },
+        ];
+
+        $interval(function() {
+            $http.post('http://' + $rootScope.serverIP + 'api/score', {})
+                .then(setScore, logError);
+
+            $http.post('http://' + $rootScope.serverIP + 'api/get_pickups', {})
+                .then(listOfPickups, logError);
+        }, 5000);
+
+        $interval(function(fakeStep) {
+            var fake = fakeData[fakeStep];
+
+            $scope.postData.payload = fake;
+            $scope.postData.timestamp = Date.now();
+
+            var vs = $scope.postData.payload.vehicleSpeed.speed;
+            if( vs < 35) {
+                $scope.status.speed = 'green';
+                $scope.status.smooth = 'green';
+            } else if( vs >= 35 && vs < 55 ) {
+                $scope.status.speed = 'yellow';
+                $scope.status.smooth = 'yellow';
+            } else if( vs >= 55 && vs < 72 ) {
+                $scope.status.speed = 'orange';
+                $scope.status.smooth = 'orange';
+            } else if( vs >= 72 ) {
+                $scope.status.speed = 'red';
+                $scope.status.smooth = 'red';
+            }
+
+            $http.post( 'http://' + $rootScope.serverIP + 'api/data', $scope.postData)
+                .then(logSuccessfulPost, logError);
+
+            // Navigation
+            drive.navigation.position.latitude.set(fake.navigation.position.latitude).then(function(response) {
+                // console.log('### latitude set', response);
+                drive.navigation.position.latitude.get().then(function(response) {
+                });
+            });
+            drive.navigation.position.heading.set(fake.navigation.position.heading).then(function(response) {
+                // console.log('### heading set', response);
+                drive.navigation.position.heading.get().then(function(response) {
+                    // console.log('### heading get', response);
+                });
+            });
+            drive.navigation.position.longitude.set(fake.navigation.position.longitude).then(function(response) {
+                // console.log('### longitude set', response);
+                drive.navigation.position.longitude.get().then(function(response) {
+                    // console.log('### longitude get', response);
+                });
+            });
+            drive.navigation.position.altitude.set(fake.navigation.position.altitude).then(function(response) {
+                // console.log('### altitude set', response);
+                drive.navigation.position.altitude.get().then(function(response) {
+                    // console.log('### altitude get', response);
+                });
+            });
+            drive.navigation.position.velocity.set(fake.navigation.position.velocity).then(function(response) {
+                // console.log('### velocity set', response);
+                drive.navigation.position.velocity.get().then(function(response) {
+                    // console.log('### velocity get', response);
+                });
+            });
+            drive.navigation.position.precision.set(fake.navigation.position.precision).then(function(response) {
+                // console.log('### precision set', response);
+                drive.navigation.position.precision.get().then(function(response) {
+                    // console.log('### precision get', response);
+                });
+            });
+
+            // Speed
+            drive.vehicleinfo.vehicleSpeed.speed.set(fake.vehicleSpeed.speed).then(function(response) {
+                console.log('### speed set', response);
+                drive.vehicleinfo.vehicleSpeed.speed.get().then(function(response) {
+                    console.log('### speed get', response);
+                });
+            });
+
+            // light status
+            drive.vehicleinfo.lightStatus.rightTurn.set(fake.lightStatus.rightTurn).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.rightTurn.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+            drive.vehicleinfo.lightStatus.parking.set(fake.lightStatus.parking).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.parking.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+            drive.vehicleinfo.lightStatus.break.set(fake.lightStatus.break).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.break.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+            drive.vehicleinfo.lightStatus.fog.set(fake.lightStatus.fog.set).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.fog.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+            drive.vehicleinfo.lightStatus.highBeam.set(fake.lightStatus.highBeam.set).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.highBeam.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+            drive.vehicleinfo.lightStatus.hazard.set(fake.lightStatus.hazard).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.hazard.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+            drive.vehicleinfo.lightStatus.leftTurn.set(fake.lightStatus.leftTurn).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.leftTurn.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+            drive.vehicleinfo.lightStatus.head.set(fake.lightStatus.head).then(function(response) {
+                // console.log('### speed set', response);
+                drive.vehicleinfo.lightStatus.head.get().then(function(response) {
+                    // console.log('### speed get', response);
+                });
+            });
+
+
+            // drive.vehicleinfo.climateControl.zones[0]['airflowDirection'].set(fake.climateControl.zones[0]['airflowDirection']).then(function(response) {
+            //     console.log('### air flow set', response);
+            //     drive.vehicleinfo.climateControl.zones[0]['airflowDirection'].get().then(function(response) {
+            //         console.log('### air flow get', response);
+            //     });
+            // });
+
+            if(fakeStep < (fakeData.length)) {
+                fakeStep += 1;
+            } else {
+                fakeStep = 0;
+            }
+
+        }, 7000);
 
         $rootScope.$watchCollection('postData', function(value, oldvalue){
             if (!value || angular.equals(value, oldvalue)) return;
             $scope.postData = $rootScope.postData;
-            var vs = $scope.postData.payload.vehicleSpeed;
-            if( vs < 35) {
-                $scope.status.speed = 'green';
-            } else if( vs >= 35 && vs < 55 ) {
-                $scope.status.speed = 'yellow';
-            } else if( vs >= 55 && vs < 72 ) {
-                $scope.status.speed = 'orange';
-            } else if( vs >= 72 ) {
-                $scope.status.speed = 'red';
-            }
+            // var vs = $scope.postData.payload.vehicleSpeed;
+            // if( vs < 35) {
+            //     $scope.status.speed = 'green';
+            // } else if( vs >= 35 && vs < 55 ) {
+            //     $scope.status.speed = 'yellow';
+            // } else if( vs >= 55 && vs < 72 ) {
+            //     $scope.status.speed = 'orange';
+            // } else if( vs >= 72 ) {
+            //     $scope.status.speed = 'red';
+            // }
             // $http.post( 'http://' + $rootScope.serverIP + 'api/data', $rootScope.postData)
             //     .then(logSuccessfulPost, logError);
         });

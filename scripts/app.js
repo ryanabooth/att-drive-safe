@@ -108,7 +108,7 @@ app.run(function ($rootScope) {
 
     $rootScope.appName = 'Just Drive';
     $rootScope.showDrawer = true;
-    $rootScope.serverIP = '0.0.0.0:8081/';
+    $rootScope.serverIP = '24bf3ec1.ngrok.com/';
 
     $rootScope.postData = {
         "vin": 112233,
