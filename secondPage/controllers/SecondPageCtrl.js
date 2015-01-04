@@ -53,6 +53,15 @@ angular.module('app')
                 title: 'Route Set',
                 text: 'New destination set'
             });
+            // Destination destination = new Destination();
+            // poiLat = response.data.payload.path[response.data.payload.path.length-1][0];
+            // poiLongitude = response.data.payload.path[response.data.payload.path.length-1][1];
+            // Routing routing = new Routing();
+            // routing.setLatitude(poiLat);
+            // routing.setLongitude(poiLong);
+            // destination.setRouting(routing);
+            // drive.navigation.destination.set(destination);
+
             // drive.navigation.routes.waypoints.set(response.data.payload.path)
             // .then(function () {
                 
