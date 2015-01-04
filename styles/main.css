@@ -1,0 +1,41 @@
+.status-box{
+	padding: 10px;
+	margin-right: 10px;
+	background-color: rgba(30,30,30,.85);
+}
+
+.att-content-container:before{
+	background-color: rgba(15,15,15,.65);
+}
+
+.change {
+	background-color: blue;
+	-webkit-transition: 1s linear;
+	/*to only change opacity*/
+	/*-webkit-transition: opacity 1s linear*/
+	-moz-transition: 1s linear;
+	-o-transition: 1s linear;
+	transition: 1s linear;
+	opacity: 1;
+}
+
+.col ul {
+display: block;
+list-style-type: none;
+-webkit-margin-before: 1em;
+-webkit-margin-after: 1em;
+-webkit-margin-start: 0px;
+-webkit-margin-end: 0px;
+-webkit-padding-start: 0px;
+}
+
+.col ul .att-badge {
+float: right;
+}
+
+.col ul li {
+	display: block;
+	padding: 4px;
+	font-size: 12px;
+	border-bottom: 1px solid #333333;
+}
