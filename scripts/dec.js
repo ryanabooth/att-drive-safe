@@ -22,18 +22,12 @@ function decCallback(decResponse) {
 function process(data) {
 
     if(data.position || data.diagnostic || data.climateControl || data.tire || data.lightStatus || data.vehicleinfo) {
-        $rootScope.postData = {
-            "vin": 112233,
-            "payload": {
-                "position": data.position,
-                "diagnostic": data.diagnostic,
-                "climateControl": data.climateControl,
-                "tire": data.tire,
-                "lightStatus": data.lightStatus,
-                "vehicleSpeed": data.vehicleSpeed
-            },
-            "timestamp": new Date()
-        };
+        if(data.position) { $rootScope.postData.payload.position = data.position; }
+        if(data.diagnostic) { $rootScope.postData.payload.diagnostic = data.diagnostic; }
+        if(data.climateControl) { $rootScope.postData.payload.climateControl = data.climateControl; }
+        if(data.lightStatus) { $rootScope.postData.payload.lightStatus = data.lightStatus; }
+        if(data.vehicleSpeed) { $rootScope.postData.payload.vehicleSpeed = data.vehicleSpeed; }
+        $rootScope.postData.timestamp = new Date();
     }
 
     if (data.pois != null) {
