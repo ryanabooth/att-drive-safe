@@ -30,7 +30,7 @@ function process(data) {
                 "climateControl": data.climateControl,
                 "tire": data.tire,
                 "lightStatus": data.lightStatus,
-                "vehicleinfo": data.vehicleinfo,
+                "vehicleSpeed": data.vehicleSpeed
             },
             "timestamp": new Date()
         };
