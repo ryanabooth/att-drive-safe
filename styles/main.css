@@ -86,8 +86,8 @@ float: right;
 body .att-loader {
 	display: none !important;
 }
-/*
-.att-alert {
-	min-height: 125px !important;
-	padding-bottom: 40px !important;*/
+
+body .att-alert {
+	min-height: 130px !important;
+	padding-bottom: 100px !important;
 }

@@ -1808,8 +1808,8 @@ select[multiple].input-lg, textarea.input-lg {
     height: 100px;
     z-index: 3001;
     color: #fff;
-		min-height: 125px;
-		padding-bottom: 40px;
+	min-height: 125px;
+	padding-bottom: 40px;
 }
 .att-alert .alert-icon {
     display: table;
