@@ -108,6 +108,15 @@ app.run(function ($rootScope) {
 
     $rootScope.appName = 'Drive Right';
     $rootScope.showDrawer = true;
+    $rootScope.serverIP = 'localhost:3000/';
+
+    $rootScope.postData = {
+        "vin": 112233,
+        "payload": {
+            "wiperSpeed": 0, 
+        },
+        "timestamp": new Date()
+    };
 
     $rootScope.$on('$routeChangeSuccess',
         function (event, next, current) {
