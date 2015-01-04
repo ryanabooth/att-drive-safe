@@ -1,17 +1,52 @@
 ﻿'use strict';
 
-var angular, console, $rootScope;
+// var angular, console, $rootScope;
 
 angular.module('app')
-    .controller('SecondPageCtrl', ["$scope", function ($scope) {
-
+    .controller('SecondPageCtrl', ["$scope", "$http", '$interval', function ($scope, $http, $interval) {
         $rootScope.$watch('decInstance.isOnline', function(value){
             $scope.isDecOnline = value;
         });
 
-        $rootScope.$watch('postData', function(value, oldvalue){
+        function logSuccessfulPost (response) {
+            console.error('API post');
+            console.error(JSON.stringify(response));
+        }
+
+        function logError (response) {
+            console.error('Just Drive API post error');
+        }
+
+        // {'currentScore': last_score, 'avgScore': avg_score}
+        $scope.score = 75;
+
+        $scope.status = {
+            smooth: 'green',
+            messaging: 'green',
+            speed: 'green',
+            weather: 'green'
+        };
+
+        $scope.pickups = [
+          { text: 'Michael Bay', desc: '123 Fake Street', href: '', selected: false },
+          { text: 'John Wayne', desc: '123 Fake Street', href: '', selected: false }
+        ];
+
+        $rootScope.$watchCollection('postData', function(value, oldvalue){
             if (!value || angular.equals(value, oldvalue)) return;
             $scope.postData = $rootScope.postData;
+            var vs = $scope.postData.payload.vehicleSpeed;
+            if( vs < 35) {
+                $scope.status.speed = 'green';
+            } else if( vs >= 35 && vs < 55 ) {
+                $scope.status.speed = 'yellow';
+            } else if( vs >= 55 && vs < 72 ) {
+                $scope.status.speed = 'orange';
+            } else if( vs >= 72 ) {
+                $scope.status.speed = 'red';
+            }
+            // $http.post( 'http://' + $rootScope.serverIP + 'api/data', $rootScope.postData)
+            //     .then(logSuccessfulPost, logError);
         });
 
         // var deregisterIdentificationWatch = $rootScope.$watch('identification', function (value, oldvalue) {
@@ -218,4 +253,88 @@ angular.module('app')
         //     if (deregisterIdentificationWatch) deregisterIdentificationWatch();
         //     if (deregisterPositionWatch) deregisterPositionWatch();
         // });
+        // 
+        // var decFactory = {};
+
+        // decFactory.showStorageData = function(content){
+        //     console.log("sample-app: Showing storage");
+        //     var datastruct = "";
+        //     var e = "",
+        //         o = 0;
+        //     for (console.log("Local Storage length is" + localStorage.length), o = 0; o <= localStorage.length - 1; o++){
+        //         e = localStorage.key(o);
+        //         var n = /\d/g;
+        //         n.test(e)||(datastruct += e + " : " + localStorage.getItem(e) + "\n");
+        //     }
+        //     alert(datastruct);
+        // };
+
+        // decFactory.stringToObj = function(path,value,obj) {
+        //     var parts = path.split("."), part;
+        //     var l = parts.length;
+        //     var key = parts[l-1];
+        //     var restparts = parts.slice(0,l-1);
+
+        //     //alert("Parts " + parts + " Key " + key + "  Rest " + restparts);
+        //     while(part = restparts.shift()) {
+        //         if( typeof obj[part] != "object") obj[part] = {};
+        //         obj = obj[part]; // update "pointer"
+        //     }
+        //     obj[key] = value;
+        // };
+
+        // decFactory.showStorageSubscriptions = function(content){
+        //     showLocalStorageForSubscriptions();
+        //     //console.log("sample-app: Showing storage subscriptions");
+        //     //var datastruct = "";
+        //     //var e = "",
+        //     //    o = 0;
+        //     //for (console.log("Local Storage length is" + localStorage.length), o = 0; o <= localStorage.length - 1; o++){
+        //     //    e = localStorage.key(o);
+        //     //    var n = /\d/g;
+        //     //    n.test(e)&&(datastruct += e + " : " + localStorage.getItem(e) + "\n");
+        //     //}
+        //     //alert(datastruct);
+        // };
+
+        // decFactory.pullStorage = function() {
+        //     console.log("sample-app: Showing storage");
+        //     var obj = {};
+        //     var e = "",
+        //         o = 0;
+        //     for (o = 0; o <= localStorage.length - 1; o++) {
+        //         e = localStorage.key(o);
+        //         console.log("key", e);
+        //         var n = /\d/g;
+        //         if (!n.test(e)) {
+        //             decFactory.stringToObj(e, localStorage.getItem(e), obj);
+        //         }
+        //     }
+        //     var jsonString = JSON.stringify(obj);
+        //     var jsonObject = JSON.parse(jsonString);
+
+        //     // //Merge JSON objects to keep existing information
+        //     // if (jsonObject.vehicleinfo != null)
+        //     //     decFactory.vehicleInfo = $.extend( decFactory.vehicleInfo, jsonObject.vehicleinfo);
+        //     // else
+        //     //     console.log("sample-app: No vehicle info in local storage");
+        //     // if (jsonObject.navigation != null)
+        //     //     decFactory.position = $.extend( decFactory.position, jsonObject.navigation.position);
+        //     // else
+        //     //     console.log("sample-app: No navigation info in local storage");
+        //     // if (jsonObject.notification != null)
+        //     //     decFactory.notification = $.extend( decFactory.notification, jsonObject.notification.message);
+        //     // else
+        //     //     console.log("sample-app: No notifications in local storage");
+        //     $scope.postData = jsonObject;
+        // };
+
+        // $interval(function() {
+        //     decFactory.pullStorage();
+        // }, 1000);
+
+        // decFactory.clearStorage = function(content){
+        //     console.log("sample-app: Clearing storage");
+        //     localStorage.clear();
+        // };
     }]);

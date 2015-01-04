@@ -21,13 +21,14 @@ function decCallback(decResponse) {
 
 function process(data) {
 
-    if(data.position || data.diagnostic || data.climateControl || data.tire || data.lightStatus || data.vehicleinfo) {
+    if(data.position || data.diagnostic || data.climateControl || data.lightStatus || data.vehicleSpeed) {
+        console.log('###'+JSON.stringify(data));
         if(data.position) { $rootScope.postData.payload.position = data.position; }
         if(data.diagnostic) { $rootScope.postData.payload.diagnostic = data.diagnostic; }
         if(data.climateControl) { $rootScope.postData.payload.climateControl = data.climateControl; }
         if(data.lightStatus) { $rootScope.postData.payload.lightStatus = data.lightStatus; }
         if(data.vehicleSpeed) { $rootScope.postData.payload.vehicleSpeed = data.vehicleSpeed; }
-        $rootScope.postData.timestamp = new Date();
+        $rootScope.postData.timestamp = Date.now();
     }
 
     if (data.pois != null) {

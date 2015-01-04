@@ -39,3 +39,46 @@ float: right;
 	font-size: 12px;
 	border-bottom: 1px solid #333333;
 }
+
+.clear-list {
+	background-color: rgba(0,0,0,0);
+	padding-top: 0;
+}
+
+.att-grid .pickups.row {
+	margin: 0;
+}
+
+.pickups h3 {
+	margin: 0;
+}
+
+.pickup-list {
+	margin-top: 20px;
+}
+
+.score img {
+	width: 120px;
+	vertical-align: top;
+}
+
+.score {
+	margin: 0;
+	font-size: 122px;
+	color: white;
+	display: inline-block;
+}
+
+.score small {
+	font-size: 36px;
+	color: grey;
+}
+
+.driving-badges {
+	font-size: 16px;
+	padding-left: 0;
+}
+
+.driving-badges .col, .driving-badges .row {
+	padding-left: 0;
+}

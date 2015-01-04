@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, target-densityDpi=120" />
-    <title>myFirstApp</title>
+    <title>JustDrive</title>
     <link rel="stylesheet" href="att-sdk/styles/att-sdk.css">
     <link rel="stylesheet" href="att-sdk/styles/font-asesome.css">
     <link rel="stylesheet" href="styles/main.css"/>
@@ -12,7 +12,7 @@
 
 </head>
 <body ng-app="app">
-    <att-header app-name="appName" current-item="viewName" app-image="images/att-icon.png"></att-header>
+    <att-header app-name="appName" current-item="viewName" app-image="images/driveright-logo.png"></att-header>
     <att-content has-header="true" background-img="images/att-stencil.png">
         <ng-view></ng-view>
     </att-content>
@@ -37,4 +37,5 @@
 <!--Controllers-->
 <script src="firstPage/controllers/FirstPageCtrl.js"></script>
 <script src="secondPage/controllers/SecondPageCtrl.js"></script>
+<script src="secondPage/decFactory.js"></script>
 </html>

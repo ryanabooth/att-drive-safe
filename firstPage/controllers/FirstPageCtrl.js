@@ -15,10 +15,9 @@ angular.module('app')
 
 
         $scope.drivers = [
-          { text: 'Ryan', desc: 'Booth', href: '', selected: true },
-          { text: 'Lucas', desc: '', href: '', selected: false },
-          { text: 'Michael', desc: '', href: '', selected: false },
-          { text: 'Badge', desc: '', href: '', selected: false }
+          { text: 'James Cameron', desc: '', href: '#/secondPage', selected: true },
+          { text: 'Michael Bay', desc: '', href: '#/secondPage', selected: false },
+          { text: 'Mr. T', desc: '', href: '#/secondPage', selected: false }
         ];
 
         $scope.$on('$destroy', function () {

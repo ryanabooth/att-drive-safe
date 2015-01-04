@@ -36,14 +36,14 @@ app.config(function ($routeProvider) {
             templateUrl: 'firstPage/views/firstPage.html',
             controller: 'FirstPageCtrl',
             settings: {
-                viewName: 'Choose a Driver',
+                viewName: 'Choose Driver',
             }
         })
         .when('/secondPage', {
             templateUrl: 'secondPage/views/secondPage.html',
             controller: 'SecondPageCtrl',
             settings: {
-                viewName: 'Live Score',
+                viewName: 'Driver Score',
             }
         })
         .otherwise({
@@ -106,16 +106,16 @@ app.run(function ($rootScope) {
     window.$rootScope = $rootScope;
     initDec();
 
-    $rootScope.appName = 'Drive Right';
+    $rootScope.appName = 'Just Drive';
     $rootScope.showDrawer = true;
-    $rootScope.serverIP = 'localhost:3000/';
+    $rootScope.serverIP = '0.0.0.0:8081/';
 
     $rootScope.postData = {
         "vin": 112233,
         "payload": {
             "wiperSpeed": 0, 
         },
-        "timestamp": new Date()
+        "timestamp": Date.now()
     };
 
     $rootScope.$on('$routeChangeSuccess',
@@ -131,6 +131,6 @@ app.run(function ($rootScope) {
 
     $rootScope.appLinks = [
         { text: 'Choose Driver', desc: 'Select the current driver. ', href: '#/firstPage', selected: true },
-        { text: 'Live Score', desc: 'View your distraction score. ', href: '#/secondPage', selected: false }
+        { text: 'Driver Score', desc: 'View your distraction score. ', href: '#/secondPage', selected: false }
     ];
 });
